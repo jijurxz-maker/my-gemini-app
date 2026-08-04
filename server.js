@@ -1,6 +1,4 @@
-const express = require('express');
-const cors = require('cors');
-const { GoogleGenAI } = require("@google/genai");
+GoogleGenAI } = require("@google/genai");
 
 const app = express();
 
@@ -34,32 +32,4 @@ app.post('/api/predict', async (req, res) => {
 
         // Verify that the incoming data exists
         if (!name || !birthDate || !birthTime || !birthPlace) {
-            return res.status(400).json({ error: "Missing cosmic telemetry data." });
-        }
-
-        // Construct the targeted prompt payload
-        const userPrompt = `Analyze user telemetry: Name: ${name}, Born: ${birthDate} at ${birthTime} in ${birthPlace}. Calculate their alien prediction horoscope.`;
-
-        // Request prediction from Gemini 2.5 Flash (optimized for free-tier speed)
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: userPrompt,
-            config: {
-                systemInstruction: SYSTEM_INSTRUCTION,
-                responseMimeType: "application/json" // Mandates clean JSON formatting
-            }
-        });
-
-        // Parse Gemini's raw string response and send it right to your chat UI
-        const predictionData = JSON.parse(response.text);
-        res.json(predictionData);
-
-    } catch (error) {
-        console.error("Interstellar Transmission Failure:", error);
-        res.status(500).json({ error: "Cosmic interference detected. Failed to process data streams." });
-    }
-});
-
-// Start the server using the port provided by Render/Vercel or default to 3000 locally
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Alien Intelligence Engine operational on port ${PORT}`));
+            ))
