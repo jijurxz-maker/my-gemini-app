@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Alien Prediction</title>
+    <style>
+        :root {
+            --bg-deep: #03030c;
+            --neon-alien: #00ff66;
+            --neon-cyber: #00e5ff;
+            --neon-pulse: #ff007f;
+            --text-main: #e2e8f0;
+            --panel-glass: rgba(13, 17, 30, 0.75);
+            --border-glow: rgba(0, 255, 102, 0.2);
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            background-image: 
+                radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 40px),
+                radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 30px),
+                radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 40px);
+            background-size: 550px 550px, 350px 350px, 250px 250px;
+            background-position: 0 0, 40px 60px, 130px 270px;
+            color: var(--text-main);
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* App Structure Frame */
+        .app-shell {
+            width: 100%;
+            max-width: 480px;
+            height: 100vh;
+            background: rgba(4, 5, 15, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-left: 1px solid var(--border-glow);
+            border-right: 1px solid var(--border-glow);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
+        }
+
+        /* Interactive Header Module */
+        .app-header {
+            padding: 16px 20px;
+            background: linear-gradient(to bottom, #0a0b1e, transparent);
+            border-bottom: 1px solid rgba(0, 242, 254, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .identity-block {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar-glow {
+            width: 42px;
+            height: 42px;
+            background: radial-gradient(circle, #1a233a 0%, #050510 100%);
+            border: 2px solid var(--neon-alien);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 22px;
+            box-shadow: 0 0 15px rgba(0, 255, 102, 0.4);
+            animation: pulse-glow 2.5s infinite alternate;
+        }
+
+        .title-meta h1 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            background: linear-gradient(120deg, var(--neon-alien), var(--neon-cyber));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .title-meta span {
+            font-size: 11px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-upgrade {
+            background: linear-gradient(135deg, var(--neon-pulse), #b3005c);
+            border: none;
+            color: white;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(255, 0, 127, 0.4);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-upgrade:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 0 25px rgba(255, 0, 127, 0.7);
+        }
+
+        /* Streaming Workspace */
+        .chat-space {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            scroll-behavior: smooth;
+        }
+
+        .chat-space::-webkit-scrollbar {
+            width: 4px;
+        }
+        .chat-space::-webkit-scrollbar-thumb {
+            background: rgba(0, 229, 255, 0.2);
+            border-radius: 2px;
+        }
+
+        .msg-node {
+            max-width: 85%;
+            padding: 14px 18px;
+            border-radius: 18px;
+            font-size: 14px;
+            line-height: 1.5;
+            word-wrap: break-word;
+            animation: slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .msg-alien {
+            align-self: flex-start;
+            background: var(--panel-glass);
+            border: 1px solid rgba(0, 255, 102, 0.15);
+            border-radius: 4px 18px 18px 18px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .msg-user {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #10172a, #1e293b);
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            color: var(--neon-cyber);
+            border-radius: 18px 4px 18px 18px;
+        }
+
+        .nested-card {
+            background: rgba(5, 5, 10, 0.6);
+            border-left: 3px solid var(--neon-cyber);
+            padding: 10px 12px;
+            margin-top: 10px;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        /* Telemetry Form Architecture */
+        .telemetry-form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 14px;
+            width: 100%;
+        }
+
+        .input-row {
+            position: relative;
+        }
+
+        .input-row input {
+            width: 100%;
+            padding: 12px 14px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            border-radius: 10px;
+            color: white;
+            font-family: inherit;
+            font-size: 13px;
+            outline: none;
+            box-sizing: border-box;
+            transition: all 0.3s;
+        }
+
+        .input-row input:focus {
+            border-color: var(--neon-cyber);
+            box-shadow: 0 0 10px rgba(0, 229, 255, 0.2);
+        }
+
+        .btn-submit {
+            background: linear-gradient(90deg, var(--neon-alien), var(--neon-cyber));
+            border: none;
+            color: #020617;
+            padding: 14px;
+            border-radius: 10px;
+            font-weight: 800;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            text-transform: uppercase;
+            box-shadow: 0 4px 15px rgba(0, 255, 102, 0.2);
+        }
+
+        /* Transmission Loading Component */
+        .quantum-pulse {
+            display: flex;
+            gap: 6px;
+            padding: 8px 4px;
+            align-items: center;
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--neon-alien);
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+        .pulse-dot:nth-child(1) { animation-delay: -0.32s; }
+        .pulse-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        /* Premium Upgrades Sheet Layer */
+        .paywall-matrix {
+            position: absolute;
+            bottom: -100%;
+            left: 0;
+            width: 100%;
+            height: 82%;
+            background: #070814;
+            border-top: 2px solid var(--neon-pulse);
+            border-radius: 30px 30px 0 0;
+            z-index: 20;
+            padding: 30px 24px;
+            box-sizing: border-box;
+            transition: bottom 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .paywall-matrix.active {
+            bottom: 0;
+            box-shadow: 0 -20px 40px rgba(255, 0, 127, 0.2);
+        }
+
+        .paywall-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .paywall-header h2 {
+            margin: 0;
+            font-size: 22px;
+            background: linear-gradient(to right, #fff, var(--neon-pulse));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .btn-close-paywall {
+            background: rgba(255,255,255,0.08);
+            border: none;
+            color: #94a3b8;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .tier-deck {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            overflow-y: auto;
+            flex: 1;
+            padding-bottom: 20px;
+        }
+
+        .tier-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tier-card:hover {
+            background: rgba(255, 0, 127, 0.04);
+            border-color: rgba(255, 0, 127, 0.4);
+            transform: scale(1.01);
+        }
+
+        .tier-card.selected {
+            background: rgba(255, 0, 127, 0.08);
+            border-color: var(--neon-pulse);
+            box-shadow: 0 0 15px rgba(255, 0, 127, 0.25);
+        }
+
+        .tier-details h3 {
+            margin: 0 0 4px 0;
+            font-size: 16px;
+            color: white;
+        }
+
+        .tier-details p {
+            margin: 0;
+            font-size: 12px;
+            color: #64748b;
